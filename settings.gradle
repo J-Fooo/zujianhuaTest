@@ -1,0 +1,2 @@
+include ':app', ':common', ':order', ':personal', ':annotation', ':compiler', ':annotation_api'
+rootProject.name='zujianhuaTest'

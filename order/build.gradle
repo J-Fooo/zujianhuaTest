@@ -1,0 +1,71 @@
+if (isRelease) {
+    //正式环境，组件化，改工程为库工程
+    apply plugin: 'com.android.library'
+} else {
+//    调试时，为app工程，能单独运行
+    apply plugin: 'com.android.application'
+}
+android {
+    compileSdkVersion getRootProject().ext.app_android.compileSdkVersion
+    buildToolsVersion rootProject.ext.app_android.buildToolsVersion
+
+
+    defaultConfig {
+        if (!isRelease) {
+            applicationId "com.dd.order"
+        }
+        minSdkVersion app_android.minSdkVersion
+        targetSdkVersion app_android.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                // this.project.getName() == order
+                // this.getProject().getName() == order
+                arguments = [moduleName: project.getName(), packageNameForAPT: packageNameForAPT]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+//配置资源文件路径，方便切换环境时使用不同的文件
+    sourceSets {
+        //main文件夹下
+        main {
+            if (isRelease) {
+                manifest.srcFile "src\\main\\AndroidManifest.xml"
+                //        java文件夹下
+                java {
+                    //正式环境将调试的文件不打进apk
+                    exclude '**/debug/**'
+                }
+            } else {
+                getManifest().srcFile "src\\main\\debugMani\\AndroidManifest.xml"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation app_impl.appcompat
+    implementation app_impl.constraintlayout
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation app_impl.junit
+    androidTestImplementation app_impl.test_junit
+    androidTestImplementation app_impl.espresso_core
+
+    implementation project(':common') // 依赖公共基础库
+
+    implementation project(':annotation')
+    annotationProcessor project(':compiler')
+
+}
