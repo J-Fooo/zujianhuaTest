@@ -8,12 +8,17 @@ import com.ddd.annotation_api.jrouter_api.JRouterGroup;
 import com.ddd.annotation_api.jrouter_api.JRouterPath;
 import com.ddd.annotation_api.jrouter_api.RouterManager;
 import com.jf.annotation.JRouter;
+import com.jf.annotation.Parameter;
 
 import androidx.appcompat.app.AppCompatActivity;
 @JRouter(path = "/order/Order_MainActivity")
 public class Order_MainActivity extends AppCompatActivity {
 
+    @Parameter
+    String name;
 
+    @Parameter
+    String age;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

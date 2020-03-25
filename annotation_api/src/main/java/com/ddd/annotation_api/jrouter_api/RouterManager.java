@@ -52,26 +52,26 @@ public class RouterManager {
             }
 
             if (jRouterGroup.getGroupMap().isEmpty()) {
-                throw new RuntimeException("路由表为空。。。");
+                throw new RuntimeException("路由表groupMap为空。。。");
             }
 
             JRouterPath jRouterPath = mPathCache.get(path);
             if (jRouterPath == null) {
-//                缓存path
+                //                缓存path
                 Class<? extends JRouterPath> jrouterPathClazz = jRouterGroup.getGroupMap().get(group);
                 jRouterPath = jrouterPathClazz.newInstance();
-                mPathCache.put(path,jRouterPath);
+                mPathCache.put(path, jRouterPath);
             }
 
             if (jRouterPath.getPathMap().isEmpty()) {
-                throw new RuntimeException("路由表为空。。。");
-            }else {
+                throw new RuntimeException("路由表pathMap为空。。。");
+            } else {
                 RouterBean routerBean = jRouterPath.getPathMap().get(path);
                 if (routerBean != null) {
                     switch (routerBean.getTypeEnum()) {
                         case ACTIVITY:
                             Class<?> targetClass = routerBean.getMyClass();
-                            Intent intent = new Intent(context,targetClass);
+                            Intent intent = new Intent(context, targetClass);
                             intent.putExtras(bundleManager.getBundle());
                             context.startActivity(intent);
                             break;
@@ -79,12 +79,10 @@ public class RouterManager {
                             break;
                     }
 
-                }else {
+                } else {
                     throw new RuntimeException("路由没有注册此activity");
                 }
             }
-
-
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }

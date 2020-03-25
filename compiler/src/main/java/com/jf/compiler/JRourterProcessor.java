@@ -3,6 +3,7 @@ package com.jf.compiler;
 import com.google.auto.service.AutoService;
 import com.jf.annotation.JRouter;
 import com.jf.annotation.bean.RouterBean;
+import com.jf.compiler.config.ProcessorConfig;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -79,7 +80,10 @@ public class JRourterProcessor extends AbstractProcessor {
         if (set.isEmpty()) {
             return false;
         }
+
+        //获取被JRouter注解的类的信息element集合
         Set<? extends Element> routerElements = roundEnvironment.getElementsAnnotatedWith(JRouter.class);
+
         messager.printMessage(Diagnostic.Kind.NOTE, "process >>>>>>>>>" + routerElements.size());
         //此module有多少个被注解的地方，element就有多大
         for (Element element :
@@ -91,7 +95,7 @@ public class JRourterProcessor extends AbstractProcessor {
 
             messager.printMessage(Diagnostic.Kind.NOTE, "SimpleName>>>>>>>>>  -- " + mSimpleName);    // MainActivity   可以获取类名
             messager.printMessage(Diagnostic.Kind.NOTE, "packageName>>>>>>>>>  -- " + mPackageName);  // com.test.zujianhuatest  可以获取包名
-//            messager.printMessage(Diagnostic.Kind.NOTE, "qualifiedName>>>>>>>>>  -- " + qualifiedName); // com.test.zujianhuatest
+            //            messager.printMessage(Diagnostic.Kind.NOTE, "qualifiedName>>>>>>>>>  -- " + qualifiedName); // com.test.zujianhuatest
 
             //获取注解，拿到注解参数
             JRouter jRouter = element.getAnnotation(JRouter.class);
@@ -203,8 +207,8 @@ public class JRourterProcessor extends AbstractProcessor {
             }*/
         }
 
-        TypeElement pathType = elementTool.getTypeElement(ProcessorConfig.AROUTER_API_PATH);
-        TypeElement groupType = elementTool.getTypeElement(ProcessorConfig.AROUTER_API_GROUP);
+        TypeElement pathType = elementTool.getTypeElement(ProcessorConfig.JROUTER_API_PATH);
+        TypeElement groupType = elementTool.getTypeElement(ProcessorConfig.JROUTER_API_GROUP);
 
         try {
             createPathMethod(pathType);
@@ -214,7 +218,7 @@ public class JRourterProcessor extends AbstractProcessor {
         }
 
         try {
-            createGroupMethod(pathType,groupType);
+            createGroupMethod(pathType, groupType);
         } catch (IOException e) {
             e.printStackTrace();
             messager.printMessage(Diagnostic.Kind.NOTE, "在生成GROUP模板时，异常了 e:" + e.getMessage());
@@ -223,14 +227,14 @@ public class JRourterProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void createGroupMethod(TypeElement pathType , TypeElement groupType) throws IOException {
+    private void createGroupMethod(TypeElement pathType, TypeElement groupType) throws IOException {
         if (mBeanList.size() == 0)
             return;
         ClassName mapClass = ClassName.get(Map.class);
         ClassName stringClass = ClassName.get(String.class);
         ParameterizedTypeName typeName = ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(ClassName.get(pathType)));
         ParameterizedTypeName mapOfGroup = ParameterizedTypeName.get(mapClass, stringClass, typeName);
-        MethodSpec methodSpec = MethodSpec.methodBuilder("getGroupMap")
+        MethodSpec methodSpec = MethodSpec.methodBuilder(ProcessorConfig.GROUP_METHOD_NAME)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .addStatement("$T $N = new $T()", mapOfGroup, "groupMap", ClassName.get(HashMap.class))
@@ -253,6 +257,7 @@ public class JRourterProcessor extends AbstractProcessor {
         //所有注解的activity信息保存起来后开始生成方法
         if (mBeanList.size() == 0)
             return;
+
         ClassName mapClass = ClassName.get(Map.class);
         ClassName stringClass = ClassName.get(String.class);
         ClassName routerClass = ClassName.get(RouterBean.class);

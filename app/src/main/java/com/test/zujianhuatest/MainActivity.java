@@ -7,12 +7,19 @@ import android.view.View;
 import com.dd.order.Order_MainActivity;
 import com.dd.personal.Personal_MainActivity;
 import com.jf.annotation.JRouter;
+import com.jf.annotation.Parameter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 @JRouter(path = "/app/MainActivity",group = "app")
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
+    @Parameter
+    String name;
+
+    @Parameter
+    String age;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
